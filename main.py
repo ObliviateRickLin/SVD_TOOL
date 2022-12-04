@@ -7,7 +7,6 @@ import tempfile
 from video_extraction import *
 
 st.title("Video Extraction Tool")
-st.set_page_config(layout="wide")
 video = st.file_uploader("Upload your mp4 video.", ["mp4",])
 st.video(video)
 if video:
