@@ -61,6 +61,7 @@ def extract_background_scipy(A):
     # B = s * v[0] * u
     return B
 
+
 def extract_background(A, threshold = 10**(-14)):
     # print(A.shape)
     a = time.time()
@@ -91,18 +92,10 @@ def extract_bg(path, interval=20):
     A2 = L[1].T.astype(float)
     A3 = L[2].T.astype(float)
     num = A1.shape[1]
-    # print(A1.shape)
     a = time.time()
-    # img1 = extract_background_scipy(A1)
-    img1 = extract_background(A1)
-    # img1 = extract_background_inverse(A1)
-    # print(img1)
-    # img2 = extract_background_scipy(A2)
-    img2 = extract_background(A2)
-    # img2 = extract_background_inverse(A2)
-    # img3 = extract_background_scipy(A3)
-    img3 = extract_background(A3)
-    # img3 = extract_background_inverse(A3)
+    img1 = extract_background_scipy(A1)
+    img2 = extract_background_scipy(A2)
+    img3 = extract_background_scipy(A3)
     b = time.time()
     img1 = np.reshape(img1, (H, W), 'F')
     img2 = np.reshape(img2, (H, W), 'F')
