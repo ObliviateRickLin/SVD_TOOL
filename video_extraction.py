@@ -1,25 +1,38 @@
 import cv2 as cv
 import numpy as np
 import matplotlib.pyplot as plt
+#from scipy.sparse.linalg import gemm
+import scipy.linalg.blas as FB
 from scipy.sparse.linalg import svds
-# import scipy
-H, W = None, None
-path = '/Users/zhaosonglin/Desktop/test_videos/640_360/walking.mp4'
+import time
+import math
+
 interval = 20
 
-def read_video(path, interval):
+
+
+def read_video(path, interval=20):
+    '''
+    return: list l with ith element being the A.T, (frame x H*W)
+    '''
     global H
     global W
     capture = cv.VideoCapture(path)
-    print('file opened:', capture.isOpened())  # return True if file can be opened
+    frame_count = capture.get(cv.CAP_PROP_FRAME_COUNT)
+    # print(frame_count)
+    if interval == 1:
+        size = int(frame_count - 1)
+    else:
+        size = math.ceil(frame_count/interval) 
     count = 0
-    l = [0,0,0]
+    num = 0
+
     if capture.isOpened():
         open, frame = capture.read()
         H, W = frame.shape[:-1]
     else:
         open = False
-
+    l = [np.zeros((size,H*W)),np.zeros((size,H*W)),np.zeros((size,H*W))]
     while open:
         ret, frame = capture.read() # return two values: (bool, numpy.ndarray) 
         if frame is None:
@@ -28,62 +41,69 @@ def read_video(path, interval):
             if count % interval == 0:
                 for i in range(3):
                     m = frame[:,:,i].flatten('F')
-                    if count == 0:
-                        l[i] = m
-                    else:
-                        l[i] = np.vstack((l[i], m))  
-            # press q to exit
-            count += 1
-            # if cv.waitKey(1) & 0xFF == ord('q'):
-            #     break
-    # capture.release()
+                    l[i][num] = m
+                num += 1
+            count += 1 
     return l
 
-def extract_scipy(a):
-    u, s, v = svds(a)
+
+def extract_background_scipy(A):
+    '''
+    return: flatten matrix of the background (H*W x 1)
+    '''
+    u, s, v = svds(A, k=1)
+    # print(s)
     u1 = u[:,-1]
     s1 = s[-1]
     v1 = v[-1]
-    m = s1 * np.outer(u1, v1)
-    eigen_bg = m[:,0]
-    return eigen_bg
+    # print(s[-2:])
+    B = s1 * v1[0] * u1
+    # B = s * v[0] * u
+    return B
 
-def extract(a):
-    u, s, v = svd(a)
-    m = s * np.outer(u, v)
-    eigen_bg = m[:,0]
-    return eigen_bg
-
-def svd(A):
-    v, eigv = power_method(A.T@A)
-    sigma = eigv ** (1/2)
-    u = A@v / sigma
-    return u, sigma, v
-
-def power_method(A, threshold = 10**(-15)):
-    row, col = A.shape
-    start = [1,]
-    for _ in range(row-1):
-        start.append(0)
-    x = np.array(start).T
-    sigma, sigma_ = 1, 10
-    while abs(sigma - sigma_) >= threshold:
-        x_= A@x
-        x = x_ / np.linalg.norm(x_)
-        sigma_, sigma = sigma, x.T @ A @ x
-    return x, sigma
+def extract_background(A, threshold = 10**(-14)):
+    # print(A.shape)
+    a = time.time()
+    M = A.T @ A
+    b = time.time()
+    # print('xxx',b-a)
+    w = A.shape[1] # width of A i,e, # of frames selected
+    x = [0] * w
+    v = np.full_like(x, (1/w)**0.5, dtype=np.double)
+    sigma_sq = v.T @ M @ v
+    sigma_sq_ = 0
+    i = 0
+    print(sigma_sq - sigma_sq_)
+    while abs(sigma_sq - sigma_sq_) >= threshold:
+        print(sigma_sq - sigma_sq_)
+        i += 1
+        # print(i)
+        v_= M@v
+        v = v_ / np.linalg.norm(v_)
+        sigma_sq_, sigma_sq = sigma_sq, v.T @ M @ v
+    B = v[0] * (A @ v)
+    print('------')
+    return B
     
-def extract_bg(path, interval = 5):
-    #print('---creating matrix A---')
+def extract_bg(path, interval=20):
     L = read_video(path, interval)
     A1 = L[0].T.astype(float)
     A2 = L[1].T.astype(float)
     A3 = L[2].T.astype(float)
-    #print('---extracting background---')
-    img1 = extract(A1)
-    img2 = extract(A2)
-    img3 = extract(A3)
-    print('---creating background image---')
+    num = A1.shape[1]
+    # print(A1.shape)
+    a = time.time()
+    # img1 = extract_background_scipy(A1)
+    img1 = extract_background(A1)
+    # img1 = extract_background_inverse(A1)
+    # print(img1)
+    # img2 = extract_background_scipy(A2)
+    img2 = extract_background(A2)
+    # img2 = extract_background_inverse(A2)
+    # img3 = extract_background_scipy(A3)
+    img3 = extract_background(A3)
+    # img3 = extract_background_inverse(A3)
+    b = time.time()
     img1 = np.reshape(img1, (H, W), 'F')
     img2 = np.reshape(img2, (H, W), 'F')
     img3 = np.reshape(img3, (H, W), 'F')
@@ -99,5 +119,4 @@ def extract_bg(path, interval = 5):
     res[:,:,2] = img1 
     res = np.uint8(res)
     return res
-    #plt.imshow(res)
-    #plt.show()
+    
