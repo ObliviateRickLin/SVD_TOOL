@@ -7,7 +7,7 @@ import tempfile
 from video_extraction import *
 
 st.title("Video Extraction Tool")
-with st.expander("IMPORTANT! READ FIRST BEFORE STARTING!"):
+with st.expander("Important! Click this line to read the instruction!"):
     st.write("""This is a sample web app for our course project. 
             You can choose scipy algorithm or our algorithm to extract the background. 
             You can adjust the interval from 20 to 40 by yourself.
