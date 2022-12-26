@@ -11,7 +11,7 @@ interval = 20
 
 
 
-def read_video(path, interval=20):
+def read_video(path, interval=30):
     '''
     return: list l with ith element being the A.T, (frame x H*W)
     '''
