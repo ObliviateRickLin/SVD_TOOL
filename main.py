@@ -19,7 +19,7 @@ if video is not None: # run only when user uploads video
     vid = video.name
     with open(vid, mode='wb') as f:
         f.write(video.read()) 
-    st.image(extract_bg(tpath.name),use_column_width=True)
+    st.image(extract_bg(vid),use_column_width=True)
 
 
 
