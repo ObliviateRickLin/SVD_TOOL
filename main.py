@@ -21,9 +21,9 @@ with st.form("File uploaded and video extraction"):
     if st.form_submit_button("Extraction") and video is not None:
         with st.spinner("Waite for a while. The algorithm is extracting the background."):
             if algorithm == "SCIPY SVD":
-                st.image(extract_bg(vid),use_column_width=True)
+                st.image(extract_bg(vid, interval = interval),use_column_width=True)
             elif algorithm == "POWER ITERATION":
-                st.image(extract_bg_(vid),use_column_width=True)
+                st.image(extract_bg_(vid, interval = interval),use_column_width=True)
 
 
 
