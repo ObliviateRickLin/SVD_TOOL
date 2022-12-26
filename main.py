@@ -12,7 +12,7 @@ st.video(video)
 
 
 with st.form("File uploaded and video extraction"):
-    algorithm = st.selectbox("SCIPY SVD","POWER ITERATION")
+    algorithm = st.selectbox(options=["SCIPY SVD","POWER ITERATION"])
     interval = st.slider("Interval",min_value = 20, max_value= 40)
     if video is not None: # run only when user uploads video
         vid = video.name
