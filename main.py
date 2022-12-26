@@ -18,12 +18,12 @@ with st.form("File uploaded and video extraction"):
         vid = video.name
         with open(vid, mode='wb') as f:
             f.write(video.read()) 
-        if st.form_submit_button("Extraction"):
-            with st.spinner("Waite for a while. The algorithm is extracting the background."):
-                if algorithm == "SCIPY SVD":
-                    st.image(extract_bg(vid),use_column_width=True)
-                elif algorithm == "POWER ITERATION":
-                    st.image(extract_bg_(vid),use_column_width=True)
+    if st.form_submit_button("Extraction") and video is not None:
+        with st.spinner("Waite for a while. The algorithm is extracting the background."):
+            if algorithm == "SCIPY SVD":
+                st.image(extract_bg(vid),use_column_width=True)
+            elif algorithm == "POWER ITERATION":
+                st.image(extract_bg_(vid),use_column_width=True)
 
 
 
