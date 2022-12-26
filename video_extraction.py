@@ -11,7 +11,7 @@ interval = 20
 
 
 
-def read_video(path, interval=40):
+def read_video(path, interval=30):
     '''
     return: list l with ith element being the A.T, (frame x H*W)
     '''
@@ -113,3 +113,30 @@ def extract_bg(path, interval=20):
     res = np.uint8(res)
     return res
     
+
+def extract_bg_(path, interval=20):
+    L = read_video(path, interval)
+    A1 = L[0].T.astype(float)
+    A2 = L[1].T.astype(float)
+    A3 = L[2].T.astype(float)
+    num = A1.shape[1]
+    a = time.time()
+    img1 = extract_background(A1)
+    img2 = extract_background(A2)
+    img3 = extract_background(A3)
+    b = time.time()
+    img1 = np.reshape(img1, (H, W), 'F')
+    img2 = np.reshape(img2, (H, W), 'F')
+    img3 = np.reshape(img3, (H, W), 'F')
+    img1[img1>255] = 255
+    img1[img1<0] = 0
+    img2[img2>255] = 255
+    img2[img2<0] = 0
+    img3[img3>255] = 255
+    img3[img3<0] = 0
+    res = np.zeros((H,W,3))
+    res[:,:,0] = img3 
+    res[:,:,1] = img2 
+    res[:,:,2] = img1 
+    res = np.uint8(res)
+    return res
