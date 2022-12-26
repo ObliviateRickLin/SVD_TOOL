@@ -12,7 +12,7 @@ with st.expander("Important! Click this line to read the instruction!"):
             You can choose scipy algorithm or our algorithm to extract the background. 
             You can adjust the interval from 20 to 40 by yourself.
             Note: our platform supports all the mp4 files in the test video files except the "street.mp4" one since it's too large
-            to be stored on the disk of this free cloud platform. If this system crash, email 120090527@link.cuhk.edu.cn. """)
+            to be stored on the disk of this free cloud platform. If this system crashes, email 120090527@link.cuhk.edu.cn. """)
 video = st.file_uploader("Upload your mp4 video.", ["mp4",])
 st.video(video)
 
